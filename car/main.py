@@ -6,7 +6,7 @@ from nav import lane
 from nav import sign
 from nav import crosswalk
 import cv2 as cv
-
+import subprocess
 
 class CarState:
     def __init__(self, task):
@@ -64,7 +64,7 @@ def get_camera_lane(car_state):
             try:
                 lane_angle = lane.find_lanes(car_state.read_frame())[1]
                 car_state.update_lane_angle(lane_angle)
-                # logging.info(f'lane angle:{lane_angle}')
+                logging.info(f'lane angle:{lane_angle}')
             except:
                 pass
 
@@ -87,9 +87,13 @@ def steer(angle):
 
 def read_camera(car_state):
     cap = cv.VideoCapture(0)
+    subprocess.run('v4l2-ctl -c auto_exposure=1', shell=True)
+    subprocess.run('v4l2-ctl -c exposure_time_absolute=100', shell=True)
+    '''
     # cap.set(cv.CAP_PROP_AUTO_EXPOSURE, 3)
     cap.set(cv.CAP_PROP_AUTO_EXPOSURE, 1)
     # x = cap.set(cv.CAP_PROP_EXPOSURE, -10)
+    '''
     while True:
         ret, frame = cap.read()
         car_state.update_frame(frame)
