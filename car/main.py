@@ -23,7 +23,7 @@ class CarState:
 
     def update_frame(self, frame):
         self.frame = frame
-        cv.imwrite(f'data/exp_debug_3/frame_{self.frame_counter}.png', self.frame)
+        cv.imwrite(f'data/frame_{self.frame_counter}.png', self.frame)
         self.frame_counter += 1
 
     def update_lane_angle(self, lane_angle):
