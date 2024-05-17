@@ -62,7 +62,7 @@ def get_camera_lane(car_state):
     while True:
         if car_state.is_ready():
             try:
-                lane_angle = lane.find_lanes(car_state.read_frame())[1]
+                lane_angle = lane.find_lanes(car_state.read_frame())
                 car_state.update_lane_angle(lane_angle)
                 logging.info(f'lane angle:{lane_angle}')
             except:
