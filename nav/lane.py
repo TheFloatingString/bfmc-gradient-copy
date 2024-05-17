@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 '''
 # TODO: more clever threshold finding? like otsu's method.
 
-def find_lanes(img_orig, debug=True):
+def find_lanes(img_orig, debug=False):
     """Find lanes within an OpenCV image.
 
     Returns a list of [(rho, theta)] and the original image with
