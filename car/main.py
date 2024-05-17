@@ -62,7 +62,7 @@ def get_camera_lane(car_state):
     while True:
         if car_state.is_ready():
             try:
-                lane_angle = lane.find_lanes(car_state.read_frame())
+                lane_angle = lane.find_lanes(car_state.read_frame())[1]
                 car_state.update_lane_angle(lane_angle)
                 logging.info(f'lane angle:{lane_angle}')
             except:
@@ -87,8 +87,9 @@ def steer(angle):
 
 def read_camera(car_state):
     cap = cv.VideoCapture(0)
-    subprocess.run('v4l2-ctl -c auto_exposure=1', shell=True)
-    subprocess.run('v4l2-ctl -c exposure_time_absolute=100', shell=True)
+    # TODO changed here
+    subprocess.run('v4l2-ctl -c auto_exposure=3', shell=True)
+    # subprocess.run('v4l2-ctl -c exposure_time_absolute=100', shell=True)
     '''
     # cap.set(cv.CAP_PROP_AUTO_EXPOSURE, 3)
     cap.set(cv.CAP_PROP_AUTO_EXPOSURE, 1)
@@ -111,7 +112,7 @@ def controller(car_state):
             if car_state.is_ready():
                 if car_state.action == "follow_lane":
                     set_speed(15)
-                    steer_angle = 0.15*car_state.read_lane_angle()-8
+                    steer_angle = 0.1*car_state.read_lane_angle()-8
                     steer(steer_angle)
                     logging.info(f'STEER ANGLE: {steer_angle}')
         elif car_state.read_task()==2:
