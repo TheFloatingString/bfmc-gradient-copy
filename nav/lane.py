@@ -1,12 +1,14 @@
 import cv2 as cv
 import numpy as np
+from skimage import io
+
 '''
 from cv2.typing import MatLike
 from numpy.typing import NDArray
 '''
 # TODO: more clever threshold finding? like otsu's method.
 
-def find_lanes(img_orig, debug=False):
+def find_lanes(img_orig, debug=True):
     """Find lanes within an OpenCV image.
 
     Returns a list of [(rho, theta)] and the original image with
@@ -49,6 +51,9 @@ def find_lanes(img_orig, debug=False):
     #     ]
     # )
     # TODO: maybe tilt roi according to the yaw
+    if debug: print(f'w:{w}; h:{h}')
+    verts = np.array([(w//2,h),(w,h),(w,h//3),(w//2,h//3)])
+    '''
     verts = np.array(
         [  # ruff: noqa: F401
             [int(0.0*w), h],  # left midpoint
@@ -57,10 +62,12 @@ def find_lanes(img_orig, debug=False):
             [int(0.3*w), 3 * h // 5],  # top left
         ]
     )
+    '''
     mask = np.zeros_like(canny, dtype="uint8")
     cv.fillPoly(mask, [verts], 255)
     roi = cv.bitwise_and(canny, canny, mask=mask)
     if debug:
+        print('Display ROI')
         cv.imshow("Display window", roi)
         cv.waitKey()
 
@@ -73,6 +80,7 @@ def find_lanes(img_orig, debug=False):
     #
     # https://docs.opencv.org/4.9.0/d6/d10/tutorial_py_houghlines.html
     lines = cv.HoughLines(roi, 1, np.pi / 180, 55)
+    if debug: print(lines)
     # filter out horizontal lines
     filtered_lines = list(filter(lambda x: abs(x[0][1] - np.pi / 2) > 0.3, lines))
 
@@ -93,6 +101,9 @@ def find_lanes(img_orig, debug=False):
             cv.line(img_orig, (x1, y1), (x2, y2), (0, 0, 255), 1)
         cv.imshow("Display window", img_orig)
         cv.waitKey()
+    if debug: print(filtered_lines)
+    theta=np.mean(np.asarray(filtered_lines),axis=0)[0][1]
+    return theta
 
     sorted_lines = sorted(filtered_lines, key=lambda x: x[0][1])
     # alternate the lines by smallest -> largest -> smallest
@@ -123,7 +134,9 @@ def find_lanes(img_orig, debug=False):
         cs[c_idx] = (cs[c_idx] * n + theta) / (n + 1)
 
     avg = (np.average(clusters[0], axis=0), np.average(clusters[1], axis=0))
+    print(clusters)
     # print(clusters)
+    #'''
     if clusters[0] == [] or clusters[1] == []:
         raise Exception("There was not 2 lines found")
     # print(clusters)
@@ -150,7 +163,8 @@ def find_lanes(img_orig, debug=False):
     cv.circle(orig, (int(vx), int(vy)), 10, (255, 0, 0), -1)
     val = vx - w / 2
 
-
+    print('avg')
+    print(avg)
     for [[rho, theta]] in avg:
         # thank u chatgpt
         # https://en.wikipedia.org/wiki/Hesse_normal_form
@@ -163,6 +177,7 @@ def find_lanes(img_orig, debug=False):
         x2 = int(x0 - 1000 * (-b))
         y2 = int(y0 - 1000 * (a))
         cv.line(orig, (x1, y1), (x2, y2), (0, 0, 255), 1)
+        print(x1,y1,x2,y2)
 
     mask_overlay = np.stack([np.zeros_like(mask), mask, np.zeros_like(mask)], axis=-1)
     show = cv.addWeighted(orig, 1, mask_overlay, 0.2, 0)
@@ -172,9 +187,12 @@ def find_lanes(img_orig, debug=False):
         cv.waitKey()
 
     return show, val, avg, (vx, vy)
-
+    #'''
+    
 if __name__ == "__main__":
-    img = cv.imread("./data/exp_debug_3/frame_1.png")
-    show, val, avg, inter = find_lanes(img, debug=True)
-
-    print(val, avg)
+    img = io.imread("https://raw.githubusercontent.com/TheFloatingString/bfmc-gradient-copy/main/data/frame_85.png")
+    # img = cv.imread("https://raw.githubusercontent.com/TheFloatingString/bfmc-finals-debug-remote/main/data/exp_debug_3/frame_1.png")
+    # show, val, avg, inter = find_lanes(img, debug=True)
+    #print(val, avg)
+    theta = find_lanes(img, debug=True)
+    print(theta)
