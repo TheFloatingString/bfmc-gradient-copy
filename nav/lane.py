@@ -53,8 +53,8 @@ def find_lanes(img_orig, debug=False):
         [  # ruff: noqa: F401
             [int(0.0*w), h],  # left midpoint
             [int(1.0*w), h],  # right midpoint
-            [int(0.7*w), 3 * h // 5],  # top right
-            [int(0.3*w), 3 * h // 5],  # top left
+            [int(1*w),  h // 5],  # top right
+            [int(0*w),  h // 5],  # top left
         ]
     )
     mask = np.zeros_like(canny, dtype="uint8")
