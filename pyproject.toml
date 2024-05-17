@@ -1,0 +1,31 @@
+[tool.poetry]
+name = ""
+version = "0.1.0"
+description = ""
+authors = ["Sheheryar Parvaz <me@cherryman.org>"]
+readme = "README.md"
+# package-mode = false # --no-root
+
+[tool.poetry.dependencies]
+python = "^3.11"
+opencv-python = "^4.8.0.76"
+lxml = "^4.9.4"
+pynput = "^1.7.6"
+inference = "^0.9.15"
+supervision = "^0.18.0"
+structlog = "^24.1.0"
+
+# also run `pip install paddlepaddle paddleocr`, necessary due to
+# incompatible opencv versions. fuck python.
+# https://github.com/python-poetry/poetry/issues/697#issuecomment-470431668
+pip = "^24.0"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+
+[tool.pyright]
+reportWildcardImportFromLibrary = "none"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
