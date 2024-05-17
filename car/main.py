@@ -3,8 +3,8 @@ import time
 import logging
 from threading import Thread
 from nav import lane
-from nav import sign
-from nav import crosswalk
+# from nav import sign
+# from nav import crosswalk
 import cv2 as cv
 import subprocess
 
@@ -110,10 +110,10 @@ def controller(car_state):
         if car_state.read_task()==1:
             if car_state.is_ready():
                 if car_state.action == "follow_lane":
-                    set_speed(10)
+                    set_speed(15)
                     steer_angle = 0.15*car_state.read_lane_angle()-8
                     steer(steer_angle)
-                    # logging.info(f'STEER ANGLE: {steer_angle}')
+                    logging.info(f'STEER ANGLE: {steer_angle}')
         elif car_state.read_task()==2:
             # if car_state.is_ready():
             if True:
