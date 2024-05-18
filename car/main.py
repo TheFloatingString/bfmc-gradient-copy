@@ -16,6 +16,10 @@ class CarState:
         self.frame_counter = 0
         self.task = task
         self.stop_sign = None
+        self.semaphore_1 = 'red'
+        self.semaphore_3 = 'red'
+        self.loc_x = None
+        self.loc_y = None
 
     def is_ready(self):
         if self.frame is None: return False
@@ -43,6 +47,25 @@ class CarState:
 
     def read_stop_sign(self):
         return self.stop_sign
+
+    def update_semaphore_1(self, s1):
+        self.semaphore_1 = s1
+
+    def read_semaphore_1(self):
+        return self.semaphore_1
+
+    def update_semaphore_3(self, s3):
+        self.semaphore_3 = s3
+
+    def read_semaphore_3(self):
+        return self.semaphore_3
+
+    def update_loc(self, loc_x, lox_y):
+        self.loc_x = loc_x
+        self.loc_y = loc_y
+
+    def read_loc(self):
+        return [self.loc_x, self.loc_y]
 
 def parallel_park(car_state):
     steer(0)
@@ -100,7 +123,133 @@ def read_camera(car_state):
         car_state.update_frame(frame)
         logging.info("Added frame")
 
+def follow_lane(car_state):
+    set_speed(15)
+    steer_angle = 0.1*car_state.read_lane_angle()-8
+    steer(steer_angle)
+
+def do_traffic_stop():
+    set_speed(0)
+    time.sleep(2)
+    set_speed(15)
+
+def do_turn_left():
+    set_speed(15)
+    steer(0)
+    time.sleep(3)
+    steer(-15)
+    time.sleep(6)
+    steer(0)
+
+def do_turn_right():
+    set_speed(15)
+    steer(15)
+    time.sleep(6)
+    steer(0)
+
+def do_roundabout():
+    set_speed(15)
+    steer(20)
+    time.sleep(3)
+    steer(-25)
+    time.sleep(15)
+    steer(25)
+    time.sleep(2.5)
+    steer(0)
+    time.sleep(1)
+
 def controller(car_state):
+    steer(0)
+    set_speed(0)
+    while not car_state.is_ready():
+        pass
+    start = time.time()
+    # >> semaphore start
+    while car_state.read_semaphore_1 != 'green':
+        pass
+    # up to node id=270
+    while car_state.read_loc()[0] < 14.14:
+        follow_lane(car_state)
+
+    # >> slight turn right
+    steer(-10)
+    time.sleep(5)
+    steer(0)
+    do_traffic_stop()
+    # up to node id=252
+    while car_state.read_loc()[1] < 2.15:
+        follow_lane(car_state)
+    do_traffic_stop()
+    while car_state.read_loc()[0]>17.02:
+        follow_lane(car_state)
+    do traffic_stop()
+
+    # >> sharp turn right
+    do_turn_right()
+    # up to node id=316
+    while car_state.read_loc()[1]<9.02:
+        follow_lane(car_state)
+    do_traffic_stop()
+
+    # >> turn at roundabout
+    do_roundabout()
+    # up to node id=443
+    while car_state.read_loc()[0] > 0.33 and car_state.read_loc()[1] > 10.81:
+        follow_lane(car_state)
+    do_traffic_stop()
+    # up to node id=483/92
+    while car_state.read_loc()[1] > 7.48:
+        follow_lane(car_state)
+    do_traffic_stop()
+    # up to node id=402
+    while car_state.read_loc()[1] > 4.59:
+        follow_lane(car_state)
+    do_traffic_stop()
+
+    # >> turn left for S3
+    do_turn_left()
+    # up to node id=26
+    while car_state.read_loc()[1] < 1.93: 
+        follow_lane(car_state)
+
+    # >> stop for s3
+    do_traffic_stop()
+    while car_state.read_semaphore_3() != 'green':
+        set_speed(0)
+
+    # >> turn right after s3
+    do_turn_right()
+    # up to node id=73
+    while car_state.read_loc()[1] > 1.30:
+        follow_lane(car_state)
+    do_traffic_stop()
+
+    # >> turn left
+    do_turn_left()
+    # up to node id=185
+    while car_state.read_loc()[0] < 4.21:
+        follow_lane(car_state)
+    do_traffic_stop()
+    # up to node id=192
+    while car_state.read_loc()[1] < 0.86:
+        follow_lane(car_state)
+
+    # >> slight right to parking
+    steer(20)
+    time.sleep(4.5)
+    # up to node id=226
+    while car_state.read_loc()[0] < 8.17:
+        follow_lane(car_state)
+    do_traffic_stop()
+    # up to node id=240
+    while car_state.read_loc()[0] < 13.47:
+        follow_lane(car_state)
+    do_traffic_stop()
+
+    # >> park
+    parallel_park(car_state)
+
+def old_controller(car_state):
     steer(0)
     set_speed(0)
     # if car_state.read_task()==2: time.sleep(15)
