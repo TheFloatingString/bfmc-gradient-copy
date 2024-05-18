@@ -79,10 +79,18 @@ class processTrafficCommunication(WorkerProcess):
 #             ++    THIS WILL RUN ONLY IF YOU RUN THE CODE FROM HERE  ++
 #                  in terminal:    python3 processTrafficCommunication.py
 
-if __name__ == "__main__":
-    from multiprocessing import Queue, Event
-    import time
+import time
+from threading import Thread
+from multiprocessing import Queue, Event
 
+x = -1.0
+y = -1.0
+
+def p_run():
+    global x
+    global y
+
+    '''
     shared_memory = sharedMem()
     locsysReceivePipe, locsysSendPipe = Pipe(duplex=False)
     queueList = {
@@ -99,5 +107,20 @@ if __name__ == "__main__":
     )
     traffic_communication.start()
     time.sleep(6)
-    print(queueList["General"].get())
+    while True:
+        tmp = queueList["General"].get()
+        print(tmp)
+        x = tmp['x']
+        y = tmp['Y']
     traffic_communication.stop()
+    '''
+    x=1000
+
+
+def p_get_loc():
+    global x
+    global y
+    return [x,y]
+
+
+p_run()

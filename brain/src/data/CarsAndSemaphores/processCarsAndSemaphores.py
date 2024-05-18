@@ -74,10 +74,26 @@ class processCarsAndSemaphores(WorkerProcess):
 #             ++    THIS WILL RUN ONLY IF YOU RUN THE CODE FROM HERE  ++
 #                  in terminal:    python3 processCarsAndSemaphores.py
 
-if __name__ == "__main__":
-    from multiprocessing import Queue
-    import time
 
+from multiprocessing import Queue
+import time
+
+s1 = None
+s3 = None
+
+def p_get_s1():
+    global s1
+    return s1
+
+def p_get_s3():
+    global s3
+    return s3
+
+def p_run():
+    global s1
+    global s3
+
+    '''
     queueList = {
         "Critical": Queue(),
         "Warning": Queue(),
@@ -90,6 +106,16 @@ if __name__ == "__main__":
     process.start()
 
     time.sleep(3)
-    print(queueList["General"].get())
+    while True:
+        tmp = queueList["General"].get()
+        print(tmp)
+        # if s1 -> update s1
+        # if s3 -> update s3
 
     process.stop()
+    '''
+
+    s1 = 'green'
+    s3 = 'green'
+
+p_run()
