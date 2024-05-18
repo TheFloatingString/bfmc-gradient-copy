@@ -75,6 +75,7 @@ class processCarsAndSemaphores(WorkerProcess):
 #                  in terminal:    python3 processCarsAndSemaphores.py
 
 
+from threading import Thread
 from multiprocessing import Queue
 import time
 
@@ -93,7 +94,7 @@ def p_run():
     global s1
     global s3
 
-    '''
+    # '''
     queueList = {
         "Critical": Queue(),
         "Warning": Queue(),
@@ -108,14 +109,22 @@ def p_run():
     time.sleep(3)
     while True:
         tmp = queueList["General"].get()
-        print(tmp)
+        # print(tmp)
         # if s1 -> update s1
+        if tmp['msgID']==2 and tmp['msgValue']['id']==1:
+            s1 = tmp['msgValue']['state']
         # if s3 -> update s3
+        if tmp['msgID']==2 and tmp['msgValue']['id']==3:
+            s3 = tmp['msgValue']['state']
 
     process.stop()
-    '''
+    # '''
 
     s1 = 'green'
     s3 = 'green'
 
-p_run()
+print("hi!")
+t = Thread(target=p_run)
+t.start()
+print('hi!')
+# p_run()

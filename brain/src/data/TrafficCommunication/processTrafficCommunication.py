@@ -29,6 +29,7 @@ if __name__ == "__main__":
     import sys
 
     sys.path.insert(0, "../../..")
+    # sys.path.insert(0, "../../../../../../..")
 from multiprocessing import Pipe
 from src.data.TrafficCommunication.useful.sharedMem import sharedMem
 from src.templates.workerprocess import WorkerProcess
@@ -90,7 +91,7 @@ def p_run():
     global x
     global y
 
-    '''
+    
     shared_memory = sharedMem()
     locsysReceivePipe, locsysSendPipe = Pipe(duplex=False)
     queueList = {
@@ -101,7 +102,9 @@ def p_run():
     }
     # filename = "useful/publickey_server.pem"
     filename = "useful/publickey_server_test.pem"
-    deviceID = 3
+    # filename = "~/bfmc-gradient-copy/brain/src/data/TrafficCommunication/useful/publickey_server_test.pem"
+    # filename = "brain/src/data/TrafficCommunication/useful/publickey_server_test.pem"
+    deviceID = 4
     traffic_communication = threadTrafficCommunication(
         shared_memory, queueList, deviceID, filename
     )
@@ -110,11 +113,12 @@ def p_run():
     while True:
         tmp = queueList["General"].get()
         print(tmp)
-        x = tmp['x']
-        y = tmp['Y']
+        x = tmp['msgValue']['x']
+        y = tmp['msgValue']['Y']
     traffic_communication.stop()
-    '''
+    
     x=1000
+
 
 
 def p_get_loc():
@@ -123,4 +127,5 @@ def p_get_loc():
     return [x,y]
 
 
-p_run()
+t = Thread(target=p_run)
+t.start()

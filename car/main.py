@@ -8,8 +8,9 @@ from nav import lane
 import cv2 as cv
 import subprocess
 import sys
-sys.path.append('brain/src/data/TrafficCommunication')
+sys.path.insert(0,'brain/src/data/TrafficCommunication')
 sys.path.append('brain/src/data/CarsAndSemaphores')
+sys.path.append('brain/src/data/TrafficCommunication/useful')
 sys.path.append('brain')
 from processTrafficCommunication import p_get_loc
 from processCarsAndSemaphores import p_get_s1, p_get_s3
@@ -26,10 +27,10 @@ class CarState:
         self.frame_counter = 0
         self.task = task
         self.stop_sign = None
-        self.semaphore_1 = None
-        self.semaphore_3 = None
-        self.loc_x = None
-        self.loc_y = None
+        self.semaphore_1 = 'green'
+        self.semaphore_3 = 'green'
+        self.loc_x = 1.0
+        self.loc_y = 1000.0
 
     def is_ready(self):
         if self.frame is None: return False
@@ -135,7 +136,11 @@ def read_camera(car_state):
 
 def follow_lane(car_state):
     set_speed(15)
-    steer_angle = 0.1*car_state.read_lane_angle()-8
+    steer_angle = 0.15*car_state.read_lane_angle()-8
+    if steer_angle < -25: 
+        steer_angle = -25
+    if steer_angle > 25:
+        steer_angle = 25
     steer(steer_angle)
 
 def do_traffic_stop():

@@ -36,7 +36,9 @@ from cryptography.hazmat.primitives.serialization import (
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
+import os
 
+print(os.getcwd())
 
 def gen_key():
     private_key = rsa.generate_private_key(
